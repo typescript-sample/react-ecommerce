@@ -6,51 +6,51 @@ import ReactModal from 'react-modal';
 import { useNavigate } from 'react-router-dom';
 import { inputEdit, Status } from 'uione';
 import { getShops } from './service';
-import { Shop } from './service/location/location';
+import { Shop } from './service/shop/shop';
 interface InternalState {
-  location: Shop;
+  shop: Shop;
 }
 
-const createLocation = (): Shop => {
-  const location = createModel<Shop>();
-  return location;
+const createShop = (): Shop => {
+  const shop = createModel<Shop>();
+  return shop;
 };
 const initialize = (id: string | null, load: (id: string | null) => void, set: DispatchWithCallback<Partial<InternalState>>) => {
   load(id);
 };
 
 const initialState: InternalState = {
-  location: {} as Shop
+  shop: {} as Shop
 };
 
 const param: EditComponentParam<Shop, string, InternalState> = {
-  createModel: createLocation,
+  createModel: createShop,
   initialize
 };
 interface Props {
   state: InternalState;
   setState: DispatchWithCallback<Partial<InternalState>>;
 }
-function LocationMarker({ state, setState }: Props) {
+function ShopMarker({ state, setState }: Props) {
   const map = useMapEvents({
     click(e: Leaflet.LeafletMouseEvent) {
       const { lat, lng } = e.latlng;
-      setState({ location: { ...state.location, longitude: lat, latitude: lng } });
+      setState({ shop: { ...state.shop, longitude: lat, latitude: lng } });
     },
   });
-  return state.location === null ? null : (
-    <Marker position={[state.location.longitude ?? 1, state.location.latitude ?? 1]}>
+  return state.shop === null ? null : (
+    <Marker position={[state.shop.longitude ?? 1, state.shop.latitude ?? 1]}>
       <Popup>You are here</Popup>
     </Marker>
   );
 }
 
-export const LocationForm = () => {
+export const ShopForm = () => {
   const refForm = React.useRef();
   const navigate = useNavigate();
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   const { resource, setState, updateState, flag, save, back, state } = useEdit<Shop, string, InternalState>(refForm, initialState, getShops(), inputEdit(), param);
-  const location = state.location;
+  const shop = state.shop;
 
   const closeModal = () => {
     setModalIsOpen(false);
@@ -77,6 +77,7 @@ export const LocationForm = () => {
     e.preventDefault();
     navigate(`upload`);
   };
+
   return (
     <div className='view-container'>
       <form id='cinemaForm' name='cinemaForm' model-name='location' ref={refForm as any}>
@@ -98,7 +99,7 @@ export const LocationForm = () => {
               type='text'
               id='name'
               name='name'
-              value={location.name}
+              value={shop.name}
               readOnly={!flag.newMode}
               onChange={updateState}
               maxLength={20} required={true}
@@ -110,7 +111,7 @@ export const LocationForm = () => {
               type='text'
               id='type'
               name='type'
-              value={location.type}
+              value={shop.type}
               readOnly={!flag.newMode}
               onChange={updateState}
               maxLength={20} required={true}
@@ -122,7 +123,7 @@ export const LocationForm = () => {
               type='text'
               id='longitude'
               name='longitude'
-              value={location.longitude}
+              value={shop.longitude}
               readOnly
               onChange={updateState}
               maxLength={20} required={true}
@@ -134,7 +135,7 @@ export const LocationForm = () => {
               type='text'
               id='latitude'
               name='latitude'
-              value={location.latitude}
+              value={shop.latitude}
               readOnly
               onChange={updateState}
               maxLength={40} required={true}
@@ -146,7 +147,7 @@ export const LocationForm = () => {
               type='text'
               id='description'
               name='description'
-              value={location.description}
+              value={shop.description}
               onChange={updateState}
               maxLength={40} required={true}
               placeholder='Description' />
@@ -182,7 +183,7 @@ export const LocationForm = () => {
                   id='active'
                   name='status'
                   onChange={updateState}
-                  value={Status.Active} checked={location.status === Status.Active} />
+                  value={Status.Active} checked={shop.status === Status.Active} />
                 {resource.yes}
               </label>
               <label>
@@ -191,7 +192,7 @@ export const LocationForm = () => {
                   id='inactive'
                   name='status'
                   onChange={updateState}
-                  value={Status.Inactive} checked={location.status === Status.Inactive ? true : !location.status ?? true} />
+                  value={Status.Inactive} checked={shop.status === Status.Inactive ? true : !shop.status ?? true} />
                 {resource.no}
               </label>
             </div>
@@ -235,7 +236,7 @@ export const LocationForm = () => {
                   attribution='&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors'
                   url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
                 />
-                <LocationMarker state={state} setState={setState} />
+                <ShopMarker state={state} setState={setState} />
               </MapContainer>
             </div>
             <footer>

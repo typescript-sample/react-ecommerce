@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import Checkbox from "@mui/material/Checkbox";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useSavedItemResponse } from "./service";
 import { storage } from "uione";
 
@@ -14,9 +16,11 @@ export const SaveItem = ({ idItem }: Props) => {
   const userId: string | undefined = storage.getUserId() || "";
   const [checked, setChecked] = React.useState(false);
   const savedItemService = useSavedItemResponse();
+
   useEffect(() => {
     loadSavedItem();
   }, []);
+
   const loadSavedItem = async () => {
     if (!userId) {
       return;
@@ -35,15 +39,16 @@ export const SaveItem = ({ idItem }: Props) => {
       }
     }
   };
+
   const handleChange = async () => {
-    if(checked){
-      const rep =await savedItemService.unsavedItem(userId,idItem)
-      if(rep){
-          setChecked(false)
+    if (checked) {
+      const rep = await savedItemService.unsavedItem(userId, idItem)
+      if (rep) {
+        setChecked(false)
       }
 
-  }
-    if (!userId||checked) {
+    }
+    if (!userId || checked) {
       return;
     }
     const result = await savedItemService.savedItem(userId, idItem);
@@ -54,8 +59,8 @@ export const SaveItem = ({ idItem }: Props) => {
   return (
     <Checkbox
       {...label}
-      icon={<BookmarkBorderIcon />}
-      checkedIcon={<BookmarkIcon />}
+      icon={<FavoriteBorderIcon/>}
+      checkedIcon={<FavoriteIcon sx={{ color: "gold" }} />}
       onClick={handleChange}
       checked={checked}
     />

@@ -5,27 +5,27 @@ import { useParams } from 'react-router-dom';
 import { useShopsService, Shop } from '../service';
 
 export const Overview = () => {
-  const locationPath = useLocation();
+  const shopPath = useLocation();
   const params = useParams();
-  const [location, setLocation] = useState<Shop>();
-  const locationService = useShopsService();
+  const [shop, setShop] = useState<Shop>();
+  const shopervice = useShopsService();
+
   useEffect(() => {
     load();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  const load = async () => {
 
+  const load = async () => {
     const { id } = params;
-    const locationObj = await locationService.load(id || '');
-    if (locationObj) {
-      setLocation(locationObj);
+    const currentshop = await shopervice.load(id || '');
+    if (currentshop) {
+      setShop(currentshop);
     }
   };
 
-  if (locationPath.pathname.split('/').length === 3) {
+  if (shopPath.pathname.split('/').length === 3) {
     return (
       <div>
-        <form className='list-result'>
-          <div style={{ height: '600px', width: '800px' }}>
+        <div style={{ height: '600px', width: '800px' }}>
             <MapContainer
               center={{ lat: 10.854886268472459, lng: 106.63051128387453 }}
               zoom={16}
@@ -43,21 +43,18 @@ export const Overview = () => {
                 attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
               />
-              {location && location.id &&
-
+              {shop && shop.id &&
                 <Marker
                   // key={`marker-1`}
-                  position={[location.longitude, location.latitude]}
-
+                  position={[shop.longitude, shop.latitude]}
                 >
                   <Popup>
-                    <span>{location.name}</span>
+                    <span>{shop.name}</span>
                   </Popup>
                 </Marker>
               }
             </MapContainer>
           </div>
-        </form>
       </div>
     );
   }

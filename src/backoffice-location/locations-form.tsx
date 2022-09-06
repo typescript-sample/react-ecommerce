@@ -1,6 +1,6 @@
 import 'leaflet/dist/leaflet.css';
 import { ValueText } from 'onecore';
-import * as React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   OnClick,
   PageSizeSelect,
@@ -12,28 +12,30 @@ import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import { Pagination } from 'reactx-pagination';
 import { inputSearch } from 'uione';
+import { Shop, ShopFilter } from '../shop/service';
+import ShopCarousel from './carousel';
 import LocationCarousel from './carousel';
 import { getLocations } from './service';
 import { Location, LocationFilter } from './service/location/location';
 
-interface LocationSearch
-  extends SearchComponentState<Location, LocationFilter> {
+interface ShopSearch
+  extends SearchComponentState<Shop, ShopFilter> {
   statusList: ValueText[];
 }
-const userFilter: LocationFilter = {
+const userFilter: ShopFilter = {
   id: '',
   name: '',
   description: '',
   longitude: 0,
   latitude: 0,
 };
-const initialState: LocationSearch = {
+const initialState: ShopSearch = {
   statusList: [],
   list: [],
   filter: userFilter,
 };
-export const BLocationsForm = () => {
-  const refForm = React.useRef();
+export const BShopsForm = () => {
+  const refForm = useRef();
   const navigate = useNavigate();
   const {
     state,
@@ -44,7 +46,7 @@ export const BLocationsForm = () => {
     toggleFilter,
     pageChanged,
     pageSizeChanged,
-  } = useSearch<Location, LocationFilter, LocationSearch>(
+  } = useSearch<Shop, ShopFilter, ShopSearch>(
     refForm,
     initialState,
     getLocations(),
@@ -52,11 +54,10 @@ export const BLocationsForm = () => {
   );
   component.viewable = true;
   component.editable = true;
-  React.useEffect(() => {
+
+  useEffect(() => {
     const L = require('leaflet');
-
     delete L.Icon.Default.prototype._getIconUrl;
-
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
       iconUrl: require('leaflet/dist/images/marker-icon.png'),
@@ -68,12 +69,14 @@ export const BLocationsForm = () => {
     e.preventDefault();
     navigate(`edit/${id}`);
   };
-  const [viewList, setViewList] = React.useState(true);
-  const [list, setList] = React.useState<Location[]>([]);
-  const [filter, setFilter] = React.useState<LocationFilter>(
+  const [viewList, setViewList] = useState(true);
+  const [list, setList] = useState<Shop[]>([]);
+
+  const [filter, setFilter] = useState<ShopFilter>(
     value(state.filter)
   );
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (state.list) { setList(state.list); }
     if (state.filter) { setFilter(state.filter); }
   }, [state]);
@@ -189,7 +192,7 @@ export const BLocationsForm = () => {
               {list &&
                 list.length > 0 &&
                 list.map((location, i) => (
-               <LocationCarousel location={location} edit={edit}/>
+               <ShopCarousel shop={location} edit={edit}/>
                 ))}
             </ul>
           ) : (

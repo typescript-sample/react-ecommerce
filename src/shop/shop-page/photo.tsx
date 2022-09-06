@@ -10,27 +10,24 @@ import {
 } from '../../my-profile/my-profile';
 import './carousel.css';
 
-export const LocationPhoto = () => {
+export const ShopPhoto = () => {
   const params = useParams();
-  const [location, setLocation] = useState<Shop>();
-  const locationService = useShopsService();
-  const [pageSize, setPageSize] = useState(3);
-  const [rateClassName, setRateClassName] = useState<string>();
+  const [shop, setShop] = useState<Shop>();
+  const shopService = useShopsService();
   const [currClass, setCurrClass] = useState<string>('');
-  const resource = useResource();
   const [user, setUser] = useState<User>({} as any);
   const service = useMyProfileService();
-
 
   useEffect(() => {
     load();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const load = async () => {
     const { id } = params;
-    const locationObj = await locationService.load(id || '');
+    const currentShop = await shopService.load(id || '');
     setCurrClass('rate');
-    if (locationObj) {
-      setLocation(locationObj);
+    if (currentShop) {
+      setShop(currentShop);
     }
     service.getMyProfile('77c35c38c3554ea6906730dbcfeca0f2').then((profile) => {
       if (profile) {
@@ -43,7 +40,7 @@ export const LocationPhoto = () => {
   };
 
 
-  if (location && window.location.pathname.includes('photo')) {
+  if (shop && window.location.pathname.includes('photo')) {
     return (
       <div className='col s12 m12 l12'>
         <section className='row'>

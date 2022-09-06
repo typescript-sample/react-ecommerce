@@ -107,7 +107,6 @@ export const Review = ({ i, get, id, userId, rateRange, rateService, reactionSer
       });
     }
   };
-  console.log({i});
   
 
   if (i && window.location.pathname.includes("review")) {

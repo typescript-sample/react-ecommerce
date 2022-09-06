@@ -9,7 +9,7 @@ import {
   ShopFilter,
   shopModel,
   ShopService,
-} from './location';
+} from './shop';
 export class LocationClient
   extends Client<Shop, string, ShopFilter>
   implements ShopService {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, Routes, useParams } from 'react-router-dom';
 import imageOnline from '../assets/images/status/online.svg';
 import { getShops } from '../backoffice/service';
-import { Shop } from '../backoffice/service/location/location';
+import { Shop } from '../backoffice/service/shop/shop';
 
 export const TourForm = () => {
   const { id = '' } = useParams();

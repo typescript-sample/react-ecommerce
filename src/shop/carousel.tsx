@@ -3,27 +3,27 @@ import { OnClick } from 'react-hook-core';
 import { Carousel, CarouselImageItem, CarouselVideoItem } from 'reactx-carousel';
 import { FileInfo } from 'reactx-upload';
 import { getShops } from '../backoffice/service';
-import { Shop } from '../backoffice/service/location/location';
+import { Shop } from '../backoffice/service/shop/shop';
 import './carousel.css';
 import {SavedShop} from './savedLocation'
 
 interface Props {
   edit: (e: any, id: string) => void;
-  location: Shop;
+  shop: Shop;
 }
-export default function LocationCarousel({ edit, location }: Props) {
+export default function ShopCarousel({ edit, shop }: Props) {
   const [carousel, setCarousel] = useState(false);
   const [files, setFiles] = useState<FileInfo[]>();
   useEffect(() => {
     handleFetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location, carousel]);
+  }, [shop, carousel]);
   const locationService = getShops();
   const handleFetch = async () => {
     if (!carousel || files) { return; }
     let res;
     try {
-      res = await locationService.fetchImageUploaded(location.id);
+      res = await locationService.fetchImageUploaded(shop.id);
     } catch (error) { }
     if (res && res.length > 0) {
       for (const item of res) {
@@ -44,7 +44,7 @@ export default function LocationCarousel({ edit, location }: Props) {
         {
           source: '',
           type: 'image',
-          url: location.imageURL || '',
+          url: shop.imageURL || '',
         },
       ];
       setFiles(info);
@@ -59,13 +59,11 @@ export default function LocationCarousel({ edit, location }: Props) {
   return (
     <>
       {carousel ? (
-        
         <div className='col s12 m6 l4 xl3 card'>
           <div
             className='user-carousel-container '
             onClick={(e) => toggleCarousel(e, false)}
           >
-           
             {files && files.length > 0 ? (
               <Carousel infiniteLoop={true}>
                 {files.map((itemData, index) => {
@@ -101,10 +99,10 @@ export default function LocationCarousel({ edit, location }: Props) {
             )}
             <div className='user-carousel-content'>
               <h3
-                onClick={(e) => edit(e, location.id)}
-                className={location.status === 'I' ? 'inactive' : ''}
+                onClick={(e) => edit(e, shop.id)}
+                className={shop.status === 'I' ? 'inactive' : ''}
               >
-                {location.name}
+                {shop.name}
               </h3>
             </div>
           </div>
@@ -120,16 +118,16 @@ export default function LocationCarousel({ edit, location }: Props) {
             bottom:'0px',
             right:'50px'
           }}>
-            <SavedShop idItem={location.id} />
+            <SavedShop idItem={shop.id} />
           </div>
             <div
               className='cover'
               style={{
-                backgroundImage: `url('${location.imageURL}')`,
+                backgroundImage: `url('${shop.imageURL}')`,
               }}
               onClick={(e) => toggleCarousel(e, true)}
              ></div>
-            <h3 onClick={(e) => edit(e, location.id)}>{location.name} </h3>
+            <h3 onClick={(e) => edit(e, shop.id)}>{shop.name} </h3>
           </section>
         </li>
       )}

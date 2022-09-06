@@ -1,6 +1,7 @@
-import * as React from "react";
+
+import { useEffect, useState, useRef } from "react";
 import { OnClick, Search, SearchComponentState, useSearch, value, checked, PageSizeSelect } from "react-hook-core";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { Link } from "react-router-dom";
 import { Pagination } from "reactx-pagination";
 import { inputSearch } from "uione";
@@ -9,36 +10,45 @@ import { SortItem } from "./sortItem";
 
 import { Chip, TextField, Autocomplete } from "@mui/material";
 import { SaveItem } from "./saveItem";
+import { Shop } from "../shop/service";
 
-interface ItemSearch extends SearchComponentState<Item, ItemFilter> {}
+interface ItemSearch extends SearchComponentState<Item, ItemFilter> { }
 
-const itemFilter: ItemFilter = {
-  id: "",
-  title: "",
-  status: "",
-  description: "",
-  categories: [],
-  brand: [],
-  // price: {
-  //   max: undefined,
-  //   min: undefined,
-  // },
-};
+export interface Props {
+  shop?: Shop;
+}
 
-const initialState: ItemSearch = {
-  list: [],
-  filter: itemFilter,
-};
-
-export const ItemsForm = () => {
+export const ItemsForm = (props: Props) => {
+  const { shop } = props;
   const navigate = useNavigate();
-  const refForm = React.useRef();
-  const [categories, setCategories] = React.useState<string[]>([]);
-  const [brands, setBrands] = React.useState<string[]>([]);
+  const refForm = useRef();
+  const location = useLocation();
+  const [isShop, setIsShop] = useState<boolean>(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [brands, setBrands] = useState<string[]>([]);
+
+  console.log(props.shop);
+
+
+  useEffect(() => {
+    if (location.pathname.includes("products")) {
+      setIsShop(true);
+    }
+  }, [location.pathname])
+
+  const itemFilter: ItemFilter = {
+    shopId: props.shop?.id
+  };
+
+  const initialState: ItemSearch = {
+    list: [],
+    filter: itemFilter,
+  };
 
   const getFilter = (): ItemFilter => {
     return value(state.filter);
   };
+
   const p = { getFilter };
 
   const {
@@ -59,17 +69,41 @@ export const ItemsForm = () => {
 
   component.viewable = true;
   component.editable = true;
+
   const edit = (e: OnClick, id: string) => {
     e.preventDefault();
     navigate(`${id}`);
   };
 
   const { list } = state;
+  state.filter = {
+    ...state.filter,
+    shopId: props.shop?.id
+  }
+
   const filter = value(state.filter);
+  console.log({ filter });
+
+  const renderReviewStar = () => {
+    const starList = Array(5)
+      .fill(<i />)
+      .map((item, index) => {
+        return <i key={index}></i>;
+      });
+    const classes = Array.from(Array(5).keys())
+      .map((i) => `star-${i + 1}`)
+      .join(" ");
+    return <div className={`rv-star2 ${classes}`}>{starList}</div>;
+  };
+
+  var formatter = new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+  })
 
   return (
     <div className="view-container">
-      <header>
+      {/* <header>
         <h2>Items</h2>
         <div className="btn-group">
           {component.view !== "table" && (
@@ -94,7 +128,7 @@ export const ItemsForm = () => {
           )}
           {component.addable && <Link id="btnNew" className="btn-new" to="add" />}
         </div>
-      </header>
+      </header> */}
       <div>
         {/* Search */}
         <form id="itemsForm" name="itemsForm" noValidate={true} ref={refForm as any}>
@@ -355,22 +389,43 @@ export const ItemsForm = () => {
                 list.length > 0 &&
                 list.map((item, i) => {
                   return (
-                    <li key={i} className="col s12 m6 l4 xl3" >
-                      <section>
-                        <div onClick={(e: any) => edit(e, item.id)}>
-                          <h3>
-                            <Link to={`/${item.id}`}>{item.title}</Link>
-                          </h3>
-                          <p>{item.description}</p>
-                          <Chip label={item.brand} size="small" />
-                          <p>{item.price}</p>
-                          {item.categories &&
-                            item.categories.map((c: any, i: number) => {
-                              return <Chip key={i} label={c} size="small" />;
-                            })}
+                    <li key={i} className="col s12 m6 l3 xl3 products" >
+                      {isShop ? <div className="card-product">
+                        <div className="banner-save"><SaveItem idItem={item.id} /></div>
+                        <div className="product-image">
+                          <img src={item.imageURL} alt={item.title} />
                         </div>
-                        <SaveItem idItem={item.id}/>
-                      </section>
+                        <div className="product-info">
+                          <h3>{item.title}</h3>
+                          {renderReviewStar()}
+                          {/* <p>{item.description}</p> */}
+                          {/* <Chip label={item.brand} size="small" /> */}
+
+                          <p className="product-price">{formatter.format(item.price)}</p>
+                          <div className="brand">{item.brand}</div>
+                          <div className="categories">
+                            {item.categories &&
+                              item.categories.map((c: any, i: number) => {
+                                return <div className="cate" key={i}>{c}</div>
+                              })}
+                          </div>
+                        </div>
+                      </div>
+                        : <section>
+                          <div onClick={(e: any) => edit(e, item.id)}>
+                            <h3>
+                              <Link to={`/${item.id}`}>{item.title}</Link>
+                            </h3>
+                            <p>{item.description}</p>
+                            <Chip label={item.brand} size="small" />
+                            <p>{item.price}</p>
+                            {item.categories &&
+                              item.categories.map((c: any, i: number) => {
+                                return <Chip key={i} label={c} size="small" />;
+                              })}
+                          </div>
+                          <SaveItem idItem={item.id} />
+                        </section>}
                     </li>
                   );
                 })}
@@ -378,6 +433,6 @@ export const ItemsForm = () => {
           )}
         </form>
       </div>
-    </div>
+    </div >
   );
 };

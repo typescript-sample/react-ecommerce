@@ -3,7 +3,7 @@ import { HttpRequest } from "axios-core";
 import { useEffect, useState } from "react";
 import { OnClick } from "react-hook-core";
 import ReactModal from "react-modal";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { getFileExtension, removeFileExtension, TypeFile } from "reactx-upload";
 import { alert, message, options, useResource } from "uione";
 import imageOnline from "../../assets/images/online.svg";
@@ -12,27 +12,29 @@ import { UploadContainer } from "../../core/upload";
 import { ModalSelectCover } from "../../my-profile/modal-select-cover";
 import {
   Shop,
-  useFollowLocationResponse,
-  useLocationComment,
-  useLocationRate,
-  useLocationReaction,
-  useLocations
+  useFollowShopResponse,
+  useShopComment,
+  useShopRate,
+  useShopReaction,
+  useShops
 } from "../service";
 import { Overview } from "./overview";
-import { LocationPhoto } from "./photo";
-// import { Review } from './review';
+import { ShopPhoto } from "./photo";
 import { storage } from "uione";
 import { Review } from "../../review";
 import "../../rate.css";
+import { Products } from "./products";
+import { ItemsForm } from "../../items/items-form";
 
 // import { getFileExtension, removeFileExtension } from '../../uploads/components/UploadHook';
 const httpRequest = new HttpRequest(Axios, options);
+
 export const ShopPage = () => {
   const userId: string | undefined = storage.getUserId() || "";
   const resource = useResource();
   const { id = "" } = useParams();
-  const [location, setLocation] = useState<Shop>();
-  const locationService = useLocations();
+  const [shop, setShop] = useState<Shop>();
+  const shopService = useShops();
   const [modalUpload, setModalUpload] = useState(false);
   const [typeUpload, setTypeUpload] = useState<TypeFile>("cover");
   const [aspect, setAspect] = useState<number>(1);
@@ -45,44 +47,47 @@ export const ShopPage = () => {
   const [follower, setFollower] = useState(0);
   const [following, setFollowing] = useState(0);
   const [follow, setFollow] = useState<boolean>(false);
-  const followService = useFollowLocationResponse();
-  const rateService = useLocationRate();
-  const reactionService = useLocationReaction();
-  const commentService = useLocationComment();
+  const followService = useFollowShopResponse();
+  const rateService = useShopRate();
+  const reactionService = useShopReaction();
+  const commentService = useShopComment();
+  const shopPath = useLocation();
 
   useEffect(() => {
-    getLocation(id ?? "");
+    getShop(id ?? "");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
   useEffect(() => {
     checkFollow();
   }, []);
+
   useEffect(() => {
     loadFollow();
   }, [follow]);
+
   const loadFollow = async () => {
-    if (userId) {
-      const rep: any = await followService.loadfollow(id);
-      if (rep) {
-        setFollower(rep.followercount);
-        setFollowing(rep.followingcount);
-      }
+    const rep: any = await followService.loadfollow(id);
+    if (rep) {
+      setFollower(rep.followercount);
+      setFollowing(rep.followingcount);
     }
   };
+
   const checkFollow = async () => {
-    if (userId) {
-      const rep = await followService.checkfollow(userId, id);
-      if (rep) {
-        setFollow(true);
-      }
+    const rep = await followService.checkfollow(userId, id);
+    if (rep) {
+      setFollow(true);
     }
   };
+
   const handleFollow = async (e: any) => {
     e.preventDefault();
-    console.log('test')
     if (userId) {
       if (!follow) {
         const rep = await followService.follow(userId, id);
+        console.log({ rep });
+
         if (rep) {
           setFollow(!follow);
         }
@@ -94,15 +99,15 @@ export const ShopPage = () => {
       }
     }
   };
-  const getLocation = async (locId: string) => {
-    const currentLocation = await locationService.load(locId);
-    if (currentLocation) {
-      setLocation(currentLocation);
-      setUploadedCover(currentLocation?.coverURL);
-      setUploadedAvatar(currentLocation?.imageURL);
+  const getShop = async (id: string) => {
+    const currentShop = await shopService.load(id);
+    if (currentShop) {
+      setShop(currentShop);
+      setUploadedCover(currentShop?.coverURL);
+      setUploadedAvatar(currentShop?.imageURL);
     }
   };
-  if (!location) {
+  if (!shop) {
     return <div></div>;
   }
 
@@ -142,9 +147,9 @@ export const ShopPage = () => {
 
   const saveImageCover = (e: OnClick, url: string) => {
     e.preventDefault();
-    setLocation({ ...location, coverURL: url });
+    setShop({ ...shop, coverURL: url });
     setUploadedCover(url);
-    locationService.update({ ...location, coverURL: url }).then((successs) => {
+    shopService.update({ ...shop, coverURL: url }).then((successs) => {
       if (successs) {
         message(resource.success_save_my_profile);
       } else {
@@ -152,12 +157,15 @@ export const ShopPage = () => {
       }
     });
   };
+
   const getImageBySize = (url: string | undefined, size: number): string => {
     if (!url) {
       return "";
     }
     return removeFileExtension(url) + `_${size}.` + getFileExtension(url);
   };
+
+  console.log({ uploadedAvatar });
 
   return (
     <div className="profile view-container">
@@ -195,8 +203,7 @@ export const ShopPage = () => {
             <img
               alt=""
               className="avatar"
-              src={
-                getImageBySize(uploadedAvatar, 400) ||
+              src={uploadedAvatar ? getImageBySize(uploadedAvatar, 400) :
                 "https://www.bluebridgewindowcleaning.co.uk/wp-content/uploads/2016/04/default-avatar.png"
               }
             />
@@ -209,8 +216,8 @@ export const ShopPage = () => {
             <img className="profile-status" alt="status" src={imageOnline} />
           </div>
           <div className="profile-title">
-            <h3>{location.name}</h3>
-            <p>{location.description}</p>
+            <h3>{shop.name}</h3>
+            <p>{shop.description}</p>
             <p>{follower} followers</p>
           </div>
           {/*
@@ -221,28 +228,30 @@ export const ShopPage = () => {
           <nav className="menu">
             <ul>
               <li>
-                <Link to={`/locations/${id}`}> Overview </Link>
+                <Link to={`/shops/${id}`}> Overview </Link>
               </li>
               <li>
-                <Link to={`/locations/${id}/bookable`}> Bookable </Link>
+                <Link to={`/shops/${id}/products`}> Products </Link>
               </li>
               <li>
-                <Link to={`/locations/${id}/review`}> Review </Link>
+                <Link to={`/shops/${id}/review`}> Review </Link>
               </li>
+              {/* <li>
+                <Link to={`/shops/${id}/photo`}> Photo </Link>
+              </li> */}
               <li>
-                <Link to={`/locations/${id}/photo`}> Photo </Link>
-              </li>
-              <li>
-                <Link to={`/locations/${id}/about`}> About </Link>
+                <Link to={`/shops/${id}/about`}> About </Link>
               </li>
             </ul>
           </nav>
         </header>
         <div className="row">
           <Overview />
+          {shopPath.pathname.includes("products") ? <ItemsForm shop={shop} /> : null}
+
           <Review
-            i={location}
-            get={getLocation}
+            i={shop}
+            get={getShop}
             id={id}
             userId={userId}
             rateRange={5}
@@ -250,7 +259,7 @@ export const ShopPage = () => {
             reactionService={reactionService}
             commentService={commentService}
           />
-          <LocationPhoto />
+          {/* <ShopPhoto /> */}
         </div>
       </form>
       <ReactModal
@@ -272,7 +281,7 @@ export const ShopPage = () => {
               post={httpRequest.post}
               setURL={(dt: any) => handleChangeFile(dt)}
               type={typeUpload}
-              id={location.id}
+              id={shop.id}
               url={config.shop_url}
               aspect={aspect}
               sizes={sizes}
@@ -286,7 +295,7 @@ export const ShopPage = () => {
         </div>
       </ReactModal>
       <ModalSelectCover
-        list={location.gallery ?? []}
+        list={shop.gallery ?? []}
         modalSelectGalleryOpen={modalSelectGalleryOpen}
         closeModalUploadGallery={toggleSelectGallery}
         setImageCover={saveImageCover}

@@ -14,7 +14,7 @@ import { Pagination } from 'reactx-pagination';
 import { inputSearch } from 'uione';
 import LocationCarousel from './carousel';
 import { getShops } from './service';
-import { Shop, ShopFilter } from './service/location/location';
+import { Shop, ShopFilter } from './service/shop/shop';
 
 interface ShopSearch
   extends SearchComponentState<Shop, ShopFilter> {
@@ -32,7 +32,7 @@ const initialState: ShopSearch = {
   list: [],
   filter: userFilter,
 };
-export const LocationsForm = () => {
+export const ShopsForm = () => {
   const refForm = React.useRef();
   const navigate = useNavigate();
   const {

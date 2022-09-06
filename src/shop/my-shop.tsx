@@ -1,21 +1,25 @@
+import { useEffect, useRef, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
-import * as React from 'react';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import LocationCarousel from './carousel';
 import { Shop } from './service/shop/shop';
 import { useSavedItemResponse } from './service'
 import { storage } from "uione";
+import ShopCarousel from './carousel';
 
 
 export const MyShop = () => {
   const savedItemService = useSavedItemResponse();
   const userId: string | undefined = storage.getUserId() || "";
-  const [list, setList] = React.useState<Shop[]>()
+  const [list, setList] = useState<Shop[]>();
+  const [viewList, setViewList] = useState(true);
   const navigate = useNavigate();
-  React.useEffect(() => {
+
+  useEffect(() => {
     loadSavedItem();
   }, []);
+
   const loadSavedItem = async () => {
     if (!userId) {
       return;
@@ -23,11 +27,10 @@ export const MyShop = () => {
     const result: any = await savedItemService.getSavedItem(userId);
     setList(result)
   };
-  React.useEffect(() => {
+
+  useEffect(() => {
     const L = require('leaflet');
-
     delete L.Icon.Default.prototype._getIconUrl;
-
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
       iconUrl: require('leaflet/dist/images/marker-icon.png'),
@@ -39,7 +42,8 @@ export const MyShop = () => {
     e.preventDefault();
     navigate(`/locations/${id}`);
   };
-  const [viewList, setViewList] = React.useState(true);
+ 
+
   const onSetViewList = (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setViewList(!viewList);
@@ -78,8 +82,8 @@ export const MyShop = () => {
             <ul className='row list-view 2'>
               {list &&
                 list.length > 0 &&
-                list.map((location, i) => (
-                  <LocationCarousel location={location} edit={edit} />
+                list.map((shop, i) => (
+                  <ShopCarousel shop={shop} edit={edit} />
                 ))}
             </ul>
           ) : (
@@ -100,18 +104,18 @@ export const MyShop = () => {
                   url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
                 />
                 {list &&
-                  list.map((location, idx) => (
+                  list.map((shop, idx) => (
                     <Marker
                       key={`marker-${idx}`}
-                      position={[location.longitude, location.latitude]}
+                      position={[shop.longitude, shop.latitude]}
                       eventHandlers={{
                         click: (e) => {
-                          navigate(`${location.id}`);
+                          navigate(`${shop.id}`);
                         }
                       }}
                     >
                       <Popup>
-                        <span>{location.name}</span>
+                        <span>{shop.name}</span>
                       </Popup>
                     </Marker>
                   ))}

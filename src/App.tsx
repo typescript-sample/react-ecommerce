@@ -29,10 +29,10 @@ import { SignupForm } from "./authentication/signup-form";
 import { CategoriesForm } from "./backoffice/categories-form";
 import { CategoryForm } from "./backoffice/category-form";
 
-import { LocationForm } from "./backoffice/location-form";
+import { ShopForm } from "./backoffice/shop-form";
 
 import { BLocationForm } from "./backoffice-location/location-form";
-import { BLocationsForm } from "./backoffice-location/locations-form";
+import { BShopsForm } from "./backoffice-location/locations-form";
 
 import { ShopPage } from "./shop/shop-page";
 import { ShopsPage } from "./shop/shops-page";
@@ -161,19 +161,20 @@ function App() {
           <Route path="backoffice/categories/edit/:id" element={<CategoryForm />} />
           <Route path="backoffice/categories/add" element={<CategoryForm />} />
 
-          <Route path="backoffice/locations" element={<BLocationsForm />} />
-          <Route path="backoffice/locations/edit/:id" element={<BLocationForm />} />
-          <Route path="backoffice/locations/add" element={<BLocationForm />} />
+          <Route path="backoffice/shops" element={<BShopsForm />} />
+          <Route path="backoffice/shops/edit/:id" element={<BLocationForm />} />
+          <Route path="backoffice/shops/add" element={<BLocationForm />} />
 
-          <Route path="locations" element={<ShopsPage />} />
+          <Route path="shops" element={<ShopsPage />} />
           {/* wishlist */}
-          <Route path="my-location" element={<MyShop />} />
+          <Route path="my-shop" element={<MyShop />} />
           {/* -------- */}
-          <Route path="locations/add" element={<LocationForm />} />
-          <Route path="locations/edit/:id" element={<LocationForm />} />
-          <Route path="locations/:id" element={<ShopPage />} />
-          <Route path="locations/:id/review" element={<ShopPage />} />
-          <Route path="locations/:id/photo" element={<ShopPage />} />
+          <Route path="shops/add" element={<ShopForm />} />
+          <Route path="shops/edit/:id" element={<ShopForm />} />
+          <Route path="shops/:id" element={<ShopPage />} />
+          <Route path="shops/:id/products" element={<ShopPage />} />
+          <Route path="shops/:id/review" element={<ShopPage />} />
+          <Route path="shops/:id/photo" element={<ShopPage />} />
 
           <Route path="backoffice/articles" element={<ArticlesForm />} />
 

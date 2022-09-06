@@ -1,5 +1,6 @@
 import { Attributes, Filter, Service, Tracking, NumberRange } from 'onecore';
 import { FileInfo } from 'reactx-upload';
+import { StringLiteral } from 'typescript';
 
 export interface ItemFilter extends Filter {
   id?: string;
@@ -9,6 +10,7 @@ export interface ItemFilter extends Filter {
   categories?: string[];
   brand?: string[];
   price?: NumberRange;
+  shopId?: string;
 
 }
 export interface Item extends Tracking {
@@ -24,6 +26,7 @@ export interface Item extends Tracking {
   expiredAt?: Date;
   info?: Info;
   gallery?: FileInfo[];
+  shopId?: string;
 }
 
 export interface Info {
@@ -64,7 +67,8 @@ export const itemModel: Attributes = {
   },
   gallery:{
     
-  }
+  },
+  shopId:{}
 };
 
 

@@ -5,7 +5,7 @@ import { OnClick } from 'react-hook-core';
 import { useNavigate } from 'react-router-dom';
 import { FileInfo } from 'reactx-upload';
 import { getShops } from '../backoffice/service';
-import { Shop } from '../backoffice/service/location/location';
+import { Shop } from './service/shop/shop';
 import { Cinema } from './service';
 import './carousel.css';
 

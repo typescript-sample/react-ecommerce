@@ -11,6 +11,7 @@ import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import { Pagination } from 'reactx-pagination';
 import { inputSearch } from 'uione';
+import ShopCarousel from './carousel';
 import LocationCarousel from './carousel';
 import { useShopsService } from './service';
 import { Shop, ShopFilter } from './service/shop/shop';
@@ -183,7 +184,7 @@ export const ShopsPage = () => {
               {list &&
                 list.length > 0 &&
                 list.map((location, i) => (
-                  <LocationCarousel location={location} edit={edit} />
+                  <ShopCarousel shop={location} edit={edit} />
                 ))}
             </ul>
           ) : (

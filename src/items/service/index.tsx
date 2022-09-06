@@ -14,7 +14,7 @@ export * from "./item";
 
 const httpRequest = new HttpRequest(axios, options);
 export interface Config {
-  item_url: string;
+  my_item_url: string;
   item_category_url: string;
   item_response_url: string;
   saved_item:string;
@@ -48,7 +48,7 @@ class ApplicationContext {
   getItemService(): ItemService {
     if (!this.itemService) {
       const c = this.getConfig();
-      this.itemService = new ItemClient(httpRequest, c.item_url);
+      this.itemService = new ItemClient(httpRequest, c.my_item_url);
     }
     return this.itemService;
   }
